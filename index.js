@@ -21,15 +21,17 @@ class App {
 
   execute(code) {
     return kabuka.fetch(code)
-    .then(rows => {
-      const text = rows.join('\n');
-      logger.info(text);
-      this.postSlack({
-        channel: 'C4WN3244D',
-        icon_emoji: ':moneybag:',
-        username: 'Kabuka',
-        text,
-      });
+    .then(async rows => {
+      logger.info(rows);
+      for (let i = 0; i < rows.length;) {
+        await this.postSlack({
+          channel: 'C4WN3244D',
+          icon_emoji: ':moneybag:',
+          username: 'Kabuka',
+          text: rows[i],
+        });
+        if (++i < list.length) await wait(8000); // eslint-disable-line no-plusplus
+      }
     });
   }
 
@@ -37,7 +39,7 @@ class App {
     for (let i = 0; i < list.length;) {
       const code = list[i];
       await this.execute(code);
-      if (++i < list.length) await wait(10000); // eslint-disable-line no-plusplus
+      if (++i < list.length) await wait(7000); // eslint-disable-line no-plusplus
     }
   }
 }
