@@ -11,13 +11,13 @@ class Kabuka {
     .then(res => new JSDOM(res.data).window.document)
     .then(document => {
       const main = document.querySelector('#root > main > div > div > div');
-      const section = main.querySelector('div:nth-child(3)');
-      // const body = section.querySelector('#detail');
-      const header = section.querySelector('section > div:nth-child(2)');
+      const section = main.querySelector('section');
+      section.querySelector('div').remove();
+      const value = section.querySelector('div:nth-child(3) > div:nth-child(2)').textContent;
+      const header = section.querySelector('header');
       const name = header.querySelector('div:nth-child(1)').textContent;
-      const value = header.querySelector('div:nth-child(2)').textContent;
-      const sub = header.querySelector('div:nth-child(3) dl dd').textContent;
-      return `${value}  ${sub}  -  <${uri}|${name}  ${code}>`;
+      const price = header.querySelector('div:nth-child(2)').textContent;
+      return `${value}  |  ${price}  |  <${uri}|${name}  ${code}>`;
     });
   }
 }

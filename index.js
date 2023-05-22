@@ -19,28 +19,29 @@ class App {
     return fetch(options);
   }
 
-  execute(code) {
+  async post(rowsList) {
+    const rows = rowsList.flat();
+    if (!rows.length) return;
+    logger.info(rows);
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < rows.length; i++ && await wait(8000)) {
+      await this.postSlack({
+        channel: 'C4WN3244D',
+        icon_emoji: ':moneybag:',
+        username: 'Kabuka',
+        text: rows[i],
+      });
+    }
+  }
+
+  fetch(code) {
     return kabuka.fetch(code)
-    .then(async rows => {
-      logger.info(rows);
-      for (let i = 0; i < rows.length;) {
-        await this.postSlack({
-          channel: 'C4WN3244D',
-          icon_emoji: ':moneybag:',
-          username: 'Kabuka',
-          text: rows[i],
-        });
-        if (++i < list.length) await wait(8000); // eslint-disable-line no-plusplus
-      }
-    });
+    .catch(e => logger.error({ error: e.massage, status: e.status, code }) || []);
   }
 
   async start() {
-    for (let i = 0; i < list.length;) {
-      const code = list[i];
-      await this.execute(code);
-      if (++i < list.length) await wait(7000); // eslint-disable-line no-plusplus
-    }
+    const rows = await Promise.all(list.map(code => this.fetch(code)));
+    return this.post(rows);
   }
 }
 
