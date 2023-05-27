@@ -24,7 +24,7 @@ class App {
     if (!rows.length) return;
     logger.info(rows);
     // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < rows.length; i++ && await wait(8000)) {
+    for (let i = 0; i < rows.length; ++i && await wait(8000)) {
       await this.postSlack({
         channel: 'C4WN3244D',
         icon_emoji: ':moneybag:',
