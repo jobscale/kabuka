@@ -1,4 +1,3 @@
-const { fetch } = require('@jobscale/fetch');
 const { JSDOM } = require('jsdom');
 
 const url = 'https://finance.yahoo.co.jp/quote/{{code}}';
@@ -17,8 +16,9 @@ class Kabuka {
   fetch(code) {
     if (Array.isArray(code)) return Promise.all(code.map(c => this.fetch(c)));
     const uri = url.replace(/{{code}}/, code);
-    return fetch.get(uri)
-    .then(res => new JSDOM(res.data).window.document)
+    return fetch(uri)
+    .then(res => res.text())
+    .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document))
     .then(res => {
       const { value, price, name } = res;

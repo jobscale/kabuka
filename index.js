@@ -1,22 +1,22 @@
 const { logger } = require('@jobscale/logger');
-const { fetch } = require('@jobscale/fetch');
 const { kabuka } = require('./app');
 const { list } = require('./app/list');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
 class App {
-  postSlack(data) {
-    const url = 'https://tanpo.jsx.jp/api/slack';
+  postSlack(body) {
+    const url = 'https://jsx.jp/api/slack';
     const options = {
-      url,
       method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     };
-    return fetch(options);
+    return fetch(url, options)
+    .then(res => res.json())
+    .then(data => {
+      logger.info(data);
+    });
   }
 
   async post(rowsList) {
@@ -26,7 +26,7 @@ class App {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < rows.length; ++i && await wait(8000)) {
       await this.postSlack({
-        channel: 'C4WN3244D',
+        channel: '#random',
         icon_emoji: ':moneybag:',
         username: 'Kabuka',
         text: rows[i],
