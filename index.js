@@ -1,6 +1,7 @@
 const { logger } = require('@jobscale/logger');
 const { kabuka } = require('./app');
 const { list } = require('./app/list');
+const { holiday } = require('./app/holiday');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
@@ -41,8 +42,9 @@ class App {
   }
 
   async start() {
+    if (await holiday.isHoliday()) return;
     const rows = await Promise.all(list.map(code => this.fetch(code)));
-    return this.post(rows);
+    await this.post(rows);
   }
 }
 
