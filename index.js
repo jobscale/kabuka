@@ -42,7 +42,10 @@ class App {
   }
 
   async start() {
-    if (await holiday.isHoliday()) return;
+    if (await holiday.isHoliday()) {
+      logger.info('holiday today');
+      return;
+    }
     const rows = await Promise.all(list.map(code => this.fetch(code)));
     await this.post(rows);
   }

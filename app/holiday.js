@@ -32,9 +32,12 @@ class Holiday {
     .then(res => res.text())
     .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document))
-    .then(res => !!res.find(
-      holiday => holiday.toISOString() === today.toISOString(),
-    ));
+    .then(res => {
+      const isHoliday = res.find(
+        holiday => new Date(holiday) === new Date(today),
+      );
+      return isHoliday;
+    });
   }
 }
 
