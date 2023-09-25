@@ -13,9 +13,7 @@ class App {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     };
-    return fetch(url, options)
-    .then(res => res.json())
-    .then(data => logger.info(data));
+    return fetch(url, options);
   }
 
   async post(rowsList) {

@@ -34,7 +34,7 @@ class Holiday {
     .then(document => this.scraping(document))
     .then(res => {
       const isHoliday = res.find(
-        holiday => new Date(holiday) === new Date(today),
+        holiday => holiday.toString() === today.toString(),
       );
       return isHoliday;
     });
