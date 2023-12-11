@@ -6,7 +6,7 @@ const { holiday } = require('./app/holiday');
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
 class App {
-  postSlack(body) {
+  async postSlack(body) {
     const url = 'https://jsx.jp/api/slack';
     const options = {
       method: 'post',
@@ -19,7 +19,7 @@ class App {
   async post(rowsList) {
     const rows = rowsList.flat();
     if (!rows.length) return;
-    logger.info(rows);
+    logger.info(JSON.stringify(rows, null, 2));
     const opts = {};
     // eslint-disable-next-line no-restricted-syntax
     for (const row of rows) {
@@ -36,7 +36,7 @@ class App {
 
   fetch(code) {
     return kabuka.fetch(code)
-    .catch(e => logger.error({ error: e.massage, status: e.status, code }) || []);
+    .catch(e => logger.error({ code, e }) || []);
   }
 
   async start() {

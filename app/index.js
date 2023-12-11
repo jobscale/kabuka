@@ -4,13 +4,14 @@ const url = 'https://finance.yahoo.co.jp/quote/{{code}}';
 
 class Kabuka {
   scraping(document) {
-    const main = document.querySelector('#root > main > div > div > div');
+    const main = document.querySelector('#all_rate').parentNode;
     const header = main.querySelector('header');
     const section = header.parentElement;
     const value = section.querySelector('div:nth-child(3) > div:nth-child(2)').textContent;
     const name = header.querySelector('div:nth-child(1)').textContent;
     const price = header.querySelector('div:nth-child(2)').textContent;
-    return { value, price, name };
+    const rate = main.querySelector('#all_rate > div > div > div:nth-child(2) > span > span').textContent;
+    return { value, price, name, rate };
   }
 
   fetch(code) {
@@ -21,8 +22,8 @@ class Kabuka {
     .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document))
     .then(res => {
-      const { value, price, name } = res;
-      return `${value}  |  ${price}  |  <${uri}|${name}  ${code}>`;
+      const { value, price, name, rate } = res;
+      return `${value}  |  ${price}  |  ${rate}  |  <${uri}|${name}  ${code}>`;
     });
   }
 }
