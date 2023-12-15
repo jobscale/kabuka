@@ -23,7 +23,7 @@ class Kabuka {
     .then(document => this.scraping(document))
     .then(res => {
       const { value, price, name, rate } = res;
-      return `${value}  |  ${price}  |  ${rate}  |  <${uri}|${name}  ${code}>`;
+      return `${value}  |  ${price}\n${rate}  |  <${uri}|${name}  ${code}>`;
     });
   }
 }
