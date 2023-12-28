@@ -26,7 +26,7 @@ class App {
       if (!opts.first) opts.first = true;
       else await wait(8000);
       await this.postSlack({
-        channel: '#random',
+        channel: '#kabu',
         icon_emoji: ':moneybag:',
         username: 'Kabuka',
         text: row,
