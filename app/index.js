@@ -8,7 +8,10 @@ class Kabuka {
     const main = document.querySelector('#detail').parentNode;
     const header = main.querySelector('header');
     const section = header.parentElement;
-    const value = section.querySelector('div:nth-child(3) > div:nth-child(2)').textContent;
+    const value = (() => {
+      const line = section.querySelector('div:nth-child(3) > div:nth-child(2)').textContent;
+      return line.replace('前日比', '前日比 ').replace('(', ' (');
+    })();
     const name = header.querySelector('div:nth-child(1)').textContent;
     const price = header.querySelector('div:nth-child(2)').textContent;
     const rate = (main.querySelector('#all_rate > div > div > div:nth-child(2) > span > span') || {}).textContent;
