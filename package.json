@@ -9,13 +9,16 @@
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
-    "lint": "eslint . --fix",
+    "start": "TZ=Etc/GMT node .",
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "license": "MIT",
   "dependencies": {
-    "@jobscale/logger": "^0.3.0",
+    "@jobscale/logger": "^0.4.0",
     "dayjs": "^1.11.10",
     "jsdom": "^24.0.0"
   },
