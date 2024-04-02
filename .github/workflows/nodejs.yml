@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Nodejs CI
 
 on: [push]
 
@@ -30,7 +30,7 @@ jobs:
     - name: Npm install, lint, test
       run: |
         npm i
-        npm run lint
+        npm run lint --if-present
     - name: Docker build
       run: docker build . -t my-image-name:$(date +%s%3N)
       env:
