@@ -21,7 +21,6 @@ class App {
     if (!rows.length) return;
     logger.info(JSON.stringify(rows, null, 2));
     const opts = {};
-    // eslint-disable-next-line no-restricted-syntax
     for (const row of rows) {
       if (!opts.first) opts.first = true;
       else await wait(8000);
