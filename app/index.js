@@ -1,7 +1,9 @@
 const { logger } = require('@jobscale/logger');
+const dayjs = require('dayjs');
 const { JSDOM } = require('jsdom');
 
 const url = 'https://finance.yahoo.co.jp/quote/{{code}}';
+const fund = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
 
 class Kabuka {
   scraping(document) {
@@ -21,7 +23,12 @@ class Kabuka {
   fetch(code) {
     if (Array.isArray(code)) return Promise.all(code.map(c => this.fetch(c)));
     const uri = url.replace(/{{code}}/, code);
-    return fetch(uri)
+    return fetch(uri, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
     .then(res => res.text())
     .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document))
@@ -30,6 +37,31 @@ class Kabuka {
       return `${value}  |  ${price}\n${rate}  |  <${uri}|${name}  ${code}>`;
     })
     .catch(e => logger.warn({ code }, e));
+  }
+
+  fetchFund() {
+    return fetch(fund, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
+    .then(res => res.text())
+    .then(body => body.replace(/^fnd_rank\(/, '').replace(/\)$/, ''))
+    .then(text => {
+      const json = JSON.parse(text);
+      const ranking = json.section1.data
+      .map(data => {
+        const { Rank, FullName, NetAssetValue, ChangeValue } = data;
+        const netAsset = Number.parseInt(NetAssetValue.replace(/,/, ''), 10);
+        const change = Number.parseInt(ChangeValue, 10);
+        const percent = Math.floor((change * 100) / netAsset) / 100;
+        return `${Rank.padStart(2, ' ')} \t${NetAssetValue.padStart(8, ' ')} \t${ChangeValue.padStart(6, ' ')}   ( ${percent} % ) \t\t${FullName}`;
+      })
+      .join('\n');
+      const [ts] = dayjs().add(9, 'hour').toISOString().split('T');
+      return `${ts} Ranking\n${ranking}`;
+    });
   }
 }
 

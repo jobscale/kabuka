@@ -38,13 +38,19 @@ class App {
     .catch(e => logger.error({ code, e }) || []);
   }
 
+  fetchFund() {
+    return kabuka.fetchFund();
+  }
+
   async start() {
     if (await holiday.isHoliday()) {
       logger.info('holiday today');
       return;
     }
-    const rows = await Promise.all(list.map(code => this.fetch(code)));
-    await this.post(rows);
+    await this.fetchFund()
+    .then(rows => this.post([rows]));
+    await Promise.all(list.map(code => this.fetch(code)))
+    .then(rows => this.post(rows));
   }
 }
 
