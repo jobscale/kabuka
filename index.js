@@ -43,12 +43,12 @@ class App {
   }
 
   async start() {
+    await this.fetchFund()
+    .then(rows => this.post([rows]));
     if (await holiday.isHoliday()) {
       logger.info('holiday today');
       return;
     }
-    await this.fetchFund()
-    .then(rows => this.post([rows]));
     await Promise.all(list.map(code => this.fetch(code)))
     .then(rows => this.post(rows));
   }
