@@ -55,7 +55,7 @@ class Kabuka {
         const { Rank, FullName, NetAssetValue, ChangeValue } = data;
         const netAsset = Number.parseInt(NetAssetValue.replace(/,/, ''), 10);
         const change = Number.parseInt(ChangeValue, 10);
-        const percent = Math.floor((change * 10000) / netAsset) / 100;
+        const percent = Math.round((change * 10000) / netAsset) / 100;
         return `${Rank.padStart(2, ' ')} \t${NetAssetValue.padStart(8, ' ')} \t${ChangeValue.padStart(6, ' ')}   ( ${percent} % ) \t\t${FullName}`;
       })
       .join('\n');
