@@ -2,8 +2,8 @@ const { logger } = require('@jobscale/logger');
 const dayjs = require('dayjs');
 const { JSDOM } = require('jsdom');
 
-const url = 'https://finance.yahoo.co.jp/quote/{{code}}';
-const fund = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
+const financeUrl = 'https://finance.yahoo.co.jp/quote/{{code}}';
+const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
 
 class Kabuka {
   scraping(document) {
@@ -22,7 +22,7 @@ class Kabuka {
 
   fetch(code) {
     if (Array.isArray(code)) return Promise.all(code.map(c => this.fetch(c)));
-    const uri = url.replace(/{{code}}/, code);
+    const uri = financeUrl.replace(/{{code}}/, code);
     return fetch(uri, {
       headers: {
         'accept-language': 'ja',
@@ -39,8 +39,8 @@ class Kabuka {
     .catch(e => logger.warn({ code }, e));
   }
 
-  fetchFund() {
-    return fetch(fund, {
+  fundRanking() {
+    return fetch(fundRanking, {
       headers: {
         'accept-language': 'ja',
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -61,6 +61,43 @@ class Kabuka {
       .join('\n');
       const [ts] = dayjs().add(9, 'hour').toISOString().split('T');
       return `${ts} Ranking\n${ranking}`;
+    });
+  }
+
+  async fetchFund(fundBase, funds) {
+    if (Array.isArray(funds)) {
+      const res = [];
+      for (const fund of funds) {
+        res.push(await this.fetchFund(fundBase, fund));
+      }
+      return res;
+    }
+    const [ts] = dayjs().add(9, 'hour').toISOString().split('T');
+    const url = `https://fund.smbc.co.jp/smbchp/main/index.aspx?F=fnd_details&KEY1=${funds.url}`;
+    return fetch(`${fundBase}${funds.url}`, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
+    .then(res => res.text())
+    .then(body => body.replace(/^fnd_details\(/, '').replace(/\)$/, ''))
+    .then(text => {
+      const json = JSON.parse(text);
+      const details = json.section1.data
+      .map(data => {
+        const {
+          FullName, NetAssetValue, ChangeValue, ChangeRate,
+          InvestmentArea, InvestmentTarget,
+          ReturnMonth1, ReturnMonth3, ReturnMonth6, ReturnYear1,
+        } = data;
+        const detail = `${NetAssetValue.padStart(8, ' ')} \t${ChangeValue.padStart(6, ' ')}   ( ${ChangeRate} % ) \t\t<${url}|${FullName}>
+${InvestmentArea} \t${InvestmentTarget} \t${ts} \t<${url}|Month> ${ReturnMonth1} \t<${url}|Month 3> ${ReturnMonth3} \t<${url}|Month 6> ${ReturnMonth6} \t<${url}|Year> ${ReturnYear1}
+`;
+        return detail;
+      })
+      .join('\n');
+      return details;
     });
   }
 }

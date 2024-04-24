@@ -1,6 +1,11 @@
 const { logger } = require('@jobscale/logger');
+const dayjs = require('dayjs');
 const { kabuka } = require('./app');
-const { list } = require('./app/list');
+const {
+  list,
+  fundBase,
+  funds,
+} = require('./app/list');
 const { holiday } = require('./app/holiday');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
@@ -39,12 +44,18 @@ class App {
   }
 
   fetchFund() {
-    return kabuka.fetchFund();
+    return kabuka.fetchFund(fundBase, funds);
   }
 
   async start() {
-    await this.fetchFund()
-    .then(rows => this.post([rows]));
+    const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
+    const [hh, mm] = time.split(':');
+    const clock = `${hh}:${mm}`;
+    if (clock < '12:00') {
+      await this.fetchFund()
+      .then(rows => this.post([rows]));
+      return;
+    }
     if (await holiday.isHoliday()) {
       logger.info('holiday today');
       return;
