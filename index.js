@@ -60,7 +60,7 @@ class App {
       logger.info('holiday today');
       return;
     }
-    await Promise.all(list.map(code => this.fetch(code)))
+    await this.fetch(list)
     .then(rows => this.post(rows));
   }
 }

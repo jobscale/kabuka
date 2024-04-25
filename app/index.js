@@ -7,21 +7,23 @@ const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/f
 
 class Kabuka {
   scraping(document) {
-    const main = document.querySelector('#detail').parentNode;
+    const main = document.querySelector('main');
     const header = main.querySelector('header');
-    const section = header.parentElement;
-    const value = (() => {
-      const line = section.querySelector('div:nth-child(3) > div:nth-child(2)').textContent;
-      return line.replace('前日比', '前日比 ').replace('(', ' (');
-    })();
-    const name = header.querySelector('div:nth-child(1)').textContent;
-    const price = header.querySelector('div:nth-child(2)').textContent;
-    const rate = (main.querySelector('#all_rate > div > div > div:nth-child(2) > span > span') || {}).textContent;
+    const name = header.querySelector('div').textContent;
+    const price = header.querySelector('span').textContent;
+    const value = header.querySelector('div > div').textContent;
+    const rate = main.querySelector('#all_rate > div span > span').textContent;
     return { value, price, name, rate };
   }
 
-  fetch(code) {
-    if (Array.isArray(code)) return Promise.all(code.map(c => this.fetch(c)));
+  async fetch(code, opt = { retry: 3 }) {
+    if (Array.isArray(code)) {
+      const res = [];
+      for (const item of code) {
+        res.push(await this.fetch(item));
+      }
+      return res;
+    }
     const uri = financeUrl.replace(/{{code}}/, code);
     return fetch(uri, {
       headers: {
@@ -36,7 +38,12 @@ class Kabuka {
       const { value, price, name, rate } = res;
       return `${value}  |  ${price}\n${rate}  |  <${uri}|${name}  ${code}>`;
     })
-    .catch(e => logger.warn({ code }, e));
+    .catch(e => {
+      logger.warn({ code }, e);
+      opt.retry--;
+      if (opt.retry >= 0) return this.fetch(code, opt);
+      return undefined;
+    });
   }
 
   fundRanking() {
