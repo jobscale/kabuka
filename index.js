@@ -8,8 +8,6 @@ const {
 } = require('./app/list');
 const { holiday } = require('./app/holiday');
 
-const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
-
 class App {
   async postSlack(body) {
     const url = 'https://jsx.jp/api/slack';
@@ -21,21 +19,16 @@ class App {
     return fetch(url, options);
   }
 
-  async post(rowsList) {
+  async post(rowsList, username) {
     const rows = rowsList.flat();
     if (!rows.length) return;
     logger.info(JSON.stringify(rows, null, 2));
-    const opts = {};
-    for (const row of rows) {
-      if (!opts.first) opts.first = true;
-      else await wait(8000);
-      await this.postSlack({
-        channel: '#kabu',
-        icon_emoji: ':moneybag:',
-        username: 'Kabuka',
-        text: row,
-      });
-    }
+    await this.postSlack({
+      channel: '#kabu',
+      icon_emoji: ':moneybag:',
+      username,
+      text: rows.join('\n'),
+    });
   }
 
   fetch(code) {
@@ -53,7 +46,7 @@ class App {
     const clock = `${hh}:${mm}`;
     if (clock < '12:00') {
       await this.fetchFund()
-      .then(rows => this.post([rows]));
+      .then(rows => this.post(rows, 'Kabuka'));
       return;
     }
     if (await holiday.isHoliday()) {
@@ -61,7 +54,7 @@ class App {
       return;
     }
     await this.fetch(list)
-    .then(rows => this.post(rows));
+    .then(rows => this.post(rows, 'Fund'));
   }
 }
 
