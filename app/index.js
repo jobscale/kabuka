@@ -7,12 +7,12 @@ const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/f
 
 class Kabuka {
   scraping(document) {
-    const main = document.querySelector('main');
-    const header = main.querySelector('header');
-    const name = header.querySelector('div').textContent;
-    const price = header.querySelector('span').textContent;
-    const value = header.querySelector('div > div').textContent;
-    const rate = main.querySelector('#all_rate > div span > span').textContent;
+    const main = document.querySelector('main section > div:nth-child(2)');
+    const name = main.querySelector('header').textContent;
+    const area = main.querySelector('div:nth-child(3)');
+    const price = area.querySelector('span').textContent;
+    const value = area.querySelector('div dd').textContent;
+    const rate = document.querySelector('#all_rate > div span > span').textContent;
     return { value, price, name, rate };
   }
 
@@ -36,7 +36,7 @@ class Kabuka {
     .then(document => this.scraping(document))
     .then(res => {
       const { value, price, name, rate } = res;
-      return `${value}  |  ${price}\n${rate}  |  <${uri}|${name}  ${code}>`;
+      return `${value}  |  *${price}*  |  <${uri}|${name}  ${code}>  |  ${rate}`;
     })
     .catch(e => {
       logger.warn({ code }, e);

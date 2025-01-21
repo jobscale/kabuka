@@ -1,8 +1,8 @@
 const list = [
   ['8316.T', '2497.T', '6143.T', '9432.T', '4967.T'],
   ['7951.T', '7012.T', '9399.T', '4751.T', '9983.T'],
-  ['8035.T', '4502.T', '8802.T', '8002.T'],
-  ['7011.T', '7203.T', '7453.T', '9201.T'],
+  ['8035.T', '4502.T', '8802.T', '8002.T', '2215.T'],
+  ['7011.T', '7203.T', '7453.T', '9201.T', '6966.T', '1776.T'],
 ];
 
 const fundBase = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl%2Ffnd_details&DISPTYPE=performance&KEY1=';
