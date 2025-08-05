@@ -18,7 +18,12 @@ module.exports = {
     'no-param-reassign': 'off',
   },
   env: {
+    node: true,
     'jest/globals': true,
+  },
+  parserOptions: {
+    ecmaVersion: 2023,
+    sourceType: 'commonjs',
   },
   plugins: [
     'jest',

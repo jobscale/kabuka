@@ -31,9 +31,9 @@ class App {
     });
   }
 
-  fetch(code) {
-    return kabuka.fetch(code)
-    .catch(e => logger.error({ code, e }) || []);
+  fetch() {
+    return kabuka.fetch(list)
+    .catch(e => logger.error({ e }) || []);
   }
 
   fetchFund() {
@@ -53,7 +53,7 @@ class App {
       logger.info('holiday today');
       return;
     }
-    await this.fetch(list)
+    await this.fetch()
     .then(rows => this.post(rows, 'Fund'));
   }
 }

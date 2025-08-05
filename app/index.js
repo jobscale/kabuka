@@ -3,28 +3,36 @@ const dayjs = require('dayjs');
 const { JSDOM } = require('jsdom');
 
 const financeUrl = 'https://finance.yahoo.co.jp/quote/{{code}}';
+const chartUrl = '/chart?trm=6m';
 const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
 
 class Kabuka {
-  scraping(document) {
+  scraping(document, code) {
     const main = document.querySelector('main section > div:nth-child(2)');
-    const name = main.querySelector('header').textContent;
+    const name = main.querySelector('header')?.textContent || code;
     const area = main.querySelector('div:nth-child(3)');
-    const price = area.querySelector('span').textContent;
-    const value = area.querySelector('div dd').textContent;
-    const rate = document.querySelector('#all_rate > div span > span').textContent;
+    const price = area.querySelector('span')?.textContent;
+    const value = area.querySelector('div dd')?.textContent;
+    const bbs = document.querySelector('#all_rate > div');
+    const rate = (() => {
+      if (!bbs) return 'not care';
+      if (!bbs.querySelector('span')) return 'no idea';
+      return bbs.querySelector('span > span')?.textContent || 'keep quiet';
+    })();
     return { value, price, name, rate };
   }
 
-  async fetch(code, opt = { retry: 3 }) {
-    if (Array.isArray(code)) {
+  async fetch(item, opt = { retry: 3 }) {
+    if (Array.isArray(item)) {
       const res = [];
-      for (const item of code) {
-        res.push(await this.fetch(item));
+      for (const single of item) {
+        res.push(await this.fetch(single));
       }
       return res;
     }
+    const { code } = item;
     const uri = financeUrl.replace(/{{code}}/, code);
+    const chart = `${uri}${chartUrl}`;
     return fetch(uri, {
       headers: {
         'accept-language': 'ja',
@@ -33,15 +41,16 @@ class Kabuka {
     })
     .then(res => res.text())
     .then(data => new JSDOM(data).window.document)
-    .then(document => this.scraping(document))
+    .then(document => this.scraping(document, code))
     .then(res => {
       const { value, price, name, rate } = res;
-      return `${value}  |  *${price}*  |  <${uri}|${name}  ${code}>  |  ${rate}`;
+      return `${value}  |  *${price}*  |  <${chart}|${name}  ${code}>  |  ${rate}`;
     })
-    .catch(e => {
+    .catch(async e => {
       logger.warn({ code }, e);
+      await new Promise(resolve => { setTimeout(resolve, 1000); });
       opt.retry--;
-      if (opt.retry >= 0) return this.fetch(code, opt);
+      if (opt.retry >= 0) return this.fetch(item, opt);
       return undefined;
     });
   }
