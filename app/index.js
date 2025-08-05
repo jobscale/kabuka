@@ -51,7 +51,7 @@ class Kabuka {
       await new Promise(resolve => { setTimeout(resolve, 1000); });
       opt.retry--;
       if (opt.retry >= 0) return this.fetch(item, opt);
-      return undefined;
+      return `<${chart}|NG  ${code}>`;
     });
   }
 
