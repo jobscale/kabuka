@@ -1,12 +1,12 @@
-const { logger } = require('@jobscale/logger');
-const dayjs = require('dayjs');
-const { JSDOM } = require('jsdom');
+import { logger } from '@jobscale/logger';
+import dayjs from 'dayjs';
+import { JSDOM } from 'jsdom';
 
 const financeUrl = 'https://finance.yahoo.co.jp/quote/{{code}}';
 const chartUrl = '/chart?trm=6m';
 const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
 
-class Kabuka {
+export class Kabuka {
   scraping(document, code) {
     const main = document.querySelector('main section > div:nth-child(2)');
     const name = main.querySelector('header')?.textContent || code;
@@ -118,7 +118,9 @@ ${InvestmentArea} \t${InvestmentTarget} \t${ts} \t<${url}|Month> ${ReturnMonth1}
   }
 }
 
-module.exports = {
+export const kabuka = new Kabuka();
+
+export default {
   Kabuka,
-  kabuka: new Kabuka(),
+  kabuka,
 };

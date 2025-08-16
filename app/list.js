@@ -1,4 +1,4 @@
-const list = [
+export const list = [
   // 中長期保有
   [
     { code: '8316.T', yield: 3.66 }, // 三井住友FG
@@ -66,9 +66,9 @@ const list = [
   ],
 ];
 
-const fundBase = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl%2Ffnd_details&DISPTYPE=performance&KEY1=';
+export const fundBase = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl%2Ffnd_details&DISPTYPE=performance&KEY1=';
 
-const funds = [{
+export const funds = [{
   name: 'インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）＜世界のベスト＞',
   url: '18312991',
 }, {
@@ -157,7 +157,7 @@ const funds = [{
   url: '7931809A',
 }];
 
-module.exports = {
+export default {
   list,
   fundBase,
   funds,

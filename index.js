@@ -1,12 +1,16 @@
-const { logger } = require('@jobscale/logger');
-const dayjs = require('dayjs');
-const { kabuka } = require('./app');
-const {
+import { logger } from '@jobscale/logger';
+import dayjs from 'dayjs';
+import { kabuka } from './app/index.js';
+import {
   list,
   fundBase,
   funds,
-} = require('./app/list');
-const { holiday } = require('./app/holiday');
+} from './app/list.js';
+import { isHoliday, getHoliday } from './app/holiday.js';
+
+Object.assign(process.env, {
+  TZ: 'Asia/Tokyo',
+});
 
 class App {
   async postSlack(body) {
@@ -31,30 +35,26 @@ class App {
     });
   }
 
-  fetch() {
-    return kabuka.fetch(list)
-    .catch(e => logger.error({ e }) || []);
-  }
-
-  fetchFund() {
-    return kabuka.fetchFund(fundBase, funds);
-  }
-
-  async start() {
-    const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
-    const [hh, mm] = time.split(':');
-    const clock = `${hh}:${mm}`;
-    if (clock < '12:00') {
-      await this.fetchFund()
-      .then(rows => this.post(rows, 'Kabuka'));
-      return;
-    }
-    if (await holiday.isHoliday()) {
+  async fetch() {
+    if (await isHoliday()) {
       logger.info('holiday today');
       return;
     }
-    await this.fetch()
-    .then(rows => this.post(rows, 'Fund'));
+    const time = dayjs().format('hh:mm');
+    if (time < '12:00') {
+      await kabuka.fetchFund(fundBase, funds)
+      .then(rows => this.post(rows, 'Fund'));
+      return;
+    }
+    await kabuka.fetch(list)
+    .catch(e => logger.error({ e }) || [])
+    .then(rows => this.post(rows, 'Kabuka'));
+  }
+
+  async start() {
+    await this.fetch();
+    await getHoliday()
+    .then(holiday => this.post(holiday, 'Holiday'));
   }
 }
 

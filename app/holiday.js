@@ -1,55 +1,41 @@
-const { JSDOM } = require('jsdom');
-const dayjs = require('dayjs');
+import dayjs from 'dayjs';
 
-const url = 'https://benri.com/calendar/';
-const biz = [
-  '2024-04-30',
-  '2024-05-02',
-  '2024-08-09',
-  '2024-08-13',
-  '2024-08-14',
-  '2024-08-15',
-  '2024-08-16',
-  '2024-08-19',
-  '2024-12-30',
-  '2024-12-31',
-  '2025-01-02',
-  '2025-01-03',
-  '2025-02-10',
-];
+Object.assign(process.env, {
+  TZ: 'Asia/Tokyo',
+});
 
-class Holiday {
-  scraping(document) {
-    const main = document.querySelector('#ShukuList');
-    const list = Array.from(main.querySelectorAll('.SH_dt'));
-    const dts = list.map(div => {
-      const [yy, mm, dd] = div.textContent.split(/[年月日]/);
-      return dayjs(`${yy}-${mm}-${dd} 00:00+0900`);
-    });
-    return [
-      ...dts,
-      ...biz.map(ts => dayjs(`${ts} 00:00+0900`)),
-    ];
+export const getHoliday = async () => {
+  const holidays = await fetch('https://holidays-jp.github.io/api/v1/datetime.json')
+  .then(res => res.json());
+
+  const now = dayjs();
+  const dayAfter = [];
+  for (let i = 0; i <= 10; i++) {
+    const after = now.add(i, 'day').startOf('day');
+    const holiday = holidays[after.unix()];
+    if (holiday) {
+      dayAfter.push({
+        after: i,
+        holiday,
+        message: `${i === 0 ? '今日' : `${i}日後`} ${after.format('YYYY-MM-DD')} は「${holiday}」です`,
+      });
+    }
   }
 
-  async isHoliday(ts) {
-    const { $y: yy, $M: mm, $D: dd, $W: ww } = dayjs(ts).add(9, 'hour');
-    if ([0, 6].includes(ww)) return true;
-    const today = dayjs(`${yy}-${mm + 1}-${dd} 00:00+0900`);
-    return fetch(url)
-    .then(res => res.text())
-    .then(data => new JSDOM(data).window.document)
-    .then(document => this.scraping(document))
-    .then(res => {
-      const isHoliday = res.find(
-        holiday => holiday.toString() === today.toString(),
-      );
-      return isHoliday;
-    });
-  }
-}
+  return dayAfter.map(item => item.message);
+};
 
-module.exports = {
-  Holiday,
-  holiday: new Holiday(),
+export const isHoliday = async () => {
+  const today = dayjs().startOf('day');
+  if ([0, 6].includes(today.day())) return true;
+
+  const holidays = await fetch('https://holidays-jp.github.io/api/v1/datetime.json')
+  .then(res => res.json());
+
+  return Boolean(holidays[today.unix()]);
+};
+
+export default {
+  getHoliday,
+  isHoliday,
 };

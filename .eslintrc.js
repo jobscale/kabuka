@@ -16,6 +16,7 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'no-plusplus': 'off',
     'no-param-reassign': 'off',
+    'import/extensions': 'off',
   },
   env: {
     node: true,
@@ -23,7 +24,7 @@ module.exports = {
   },
   parserOptions: {
     ecmaVersion: 2023,
-    sourceType: 'commonjs',
+    sourceType: 'module',
   },
   plugins: [
     'jest',
