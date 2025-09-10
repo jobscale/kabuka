@@ -14,10 +14,12 @@ export const getHoliday = async () => {
     const after = now.add(i, 'day').startOf('day');
     const holiday = holidays[after.unix()];
     if (holiday) {
+      const when = ['今日', '明日', '明後日'][i] ?? `${i}日後`;
+      const message = `${when} ${after.format('YYYY-MM-DD')} は「${holiday}」です`;
       dayAfter.push({
         after: i,
         holiday,
-        message: `${i === 0 ? '今日' : `${i}日後`} ${after.format('YYYY-MM-DD')} は「${holiday}」です`,
+        message,
       });
     }
   }
