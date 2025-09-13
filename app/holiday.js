@@ -24,7 +24,7 @@ export const getHoliday = async () => {
     }
   }
 
-  return dayAfter.map(item => item.message);
+  return dayAfter.reverse().map(item => item.message);
 };
 
 export const isHoliday = async () => {
