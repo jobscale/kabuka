@@ -23,38 +23,48 @@ class App {
     return fetch(url, options);
   }
 
-  async post(rowsList, username) {
-    const rows = rowsList.flat();
-    if (!rows.length) return;
-    logger.info(JSON.stringify(rows, null, 2));
+  async post({ blocks, text }, username) {
+    if (!text && !blocks.length) return;
+    logger.info(JSON.stringify(text || blocks, null, 2));
     await this.postSlack({
       channel: '#kabu',
       icon_emoji: ':moneybag:',
       username,
-      text: rows.join('\n'),
+      text: text || username,
+      blocks,
     });
   }
 
   async fetch() {
-    if (await isHoliday()) {
+    if (false && await isHoliday()) {
       logger.info('holiday today');
       return;
     }
     const time = dayjs().format('hh:mm');
-    if (time < '12:00') {
+    if (false && time < '12:00') {
       await kabuka.fetchFund(fundBase, funds)
-      .then(rows => this.post(rows, 'Fund'));
+      .then(async rows => {
+        for (const blocks of rows) {
+          await this.post({ blocks }, 'Fund');
+          await new Promise(resolve => { setTimeout(resolve, 8000); });
+        }
+      });
       return;
     }
-    await kabuka.fetch(list)
-    .catch(e => logger.error({ e }) || [])
-    .then(rows => this.post(rows, 'Kabuka'));
+    await kabuka.fetchKabu(list)
+    .catch(e => logger.error({ e }) || [[]])
+    .then(async rows => {
+      for (const blocks of rows) {
+        await this.post({ blocks }, 'Kabuka');
+        await new Promise(resolve => { setTimeout(resolve, 8000); });
+      }
+    });
   }
 
   async start() {
     await this.fetch();
     await getHoliday()
-    .then(holiday => this.post(holiday, 'Holiday'));
+    .then(holiday => this.post({ text: holiday.join('\n') }, 'Holiday'));
   }
 }
 

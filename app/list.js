@@ -68,7 +68,7 @@ export const list = [
 
 export const fundBase = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl%2Ffnd_details&DISPTYPE=performance&KEY1=';
 
-export const funds = [{
+export const funds = [[{
   name: 'インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）＜世界のベスト＞',
   url: '18312991',
 }, {
@@ -80,7 +80,7 @@ export const funds = [{
 }, {
   name: 'ピクテ・ゴールド（為替ヘッジなし）',
   url: '42312199',
-}, {
+}], [{
   name: '三井住友・ＮＹダウ・ジョーンズ指数オープン（為替ヘッジなし）',
   url: '79315146',
 }, {
@@ -92,7 +92,7 @@ export const funds = [{
 }, {
   name: '三井住友・資産最適化ファンド（５成長重視型）',
   url: '79316179',
-}, {
+}], [{
   name: 'ＳＭＢＣ・ＤＣインデックスファンド（日経２２５）',
   url: '79311207',
 }, {
@@ -104,7 +104,7 @@ export const funds = [{
 }, {
   name: 'ＳＭＢＣ円資産ファンド',
   url: '7931715B',
-}, {
+}], [{
   name: 'ブラックロック・ゴールド・ファンド',
   url: '48311032',
 }, {
@@ -125,7 +125,7 @@ export const funds = [{
 }, {
   name: 'ブランディワイン・グローバルバリュー株式ファンド',
   url: '7931221K',
-}, {
+}], [{
   name: '外国株式指数ファンド',
   url: '7931A09A',
 }, {
@@ -155,7 +155,7 @@ export const funds = [{
 }, {
   name: '国内株式指数ファンド（ＴＯＰＩＸ）',
   url: '7931809A',
-}];
+}]];
 
 export default {
   list,
