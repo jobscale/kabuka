@@ -36,12 +36,12 @@ class App {
   }
 
   async fetch() {
-    if (false && await isHoliday()) {
+    if (await isHoliday()) {
       logger.info('holiday today');
       return;
     }
     const time = dayjs().format('hh:mm');
-    if (false && time < '12:00') {
+    if (time < '12:00') {
       await kabuka.fetchFund(fundBase, funds)
       .then(async rows => {
         for (const blocks of rows) {
