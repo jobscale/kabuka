@@ -35,6 +35,32 @@ class App {
     });
   }
 
+  async fetchFund() {
+    const opts = { text: [] };
+    for (const item of funds) {
+      opts.text = ['Fund'];
+      await kabuka.fetchFund(fundBase, { item, opts })
+      .catch(e => logger.error({ e }) || [])
+      .then(async blocks => {
+        await this.post({ blocks, text: opts.text.join(' ') }, 'Fund');
+        await new Promise(resolve => { setTimeout(resolve, 5000); });
+      });
+    }
+  }
+
+  async fetchKabu() {
+    const opts = { text: [] };
+    for (const item of list) {
+      opts.text = ['Kabuka'];
+      await kabuka.fetchKabu({ item, opts })
+      .catch(e => logger.error({ e }) || [])
+      .then(async blocks => {
+        await this.post({ blocks, text: opts.text.join(' ') }, 'Kabuka');
+        await new Promise(resolve => { setTimeout(resolve, 5000); });
+      });
+    }
+  }
+
   async fetch() {
     if (await isHoliday()) {
       logger.info('holiday today');
@@ -42,23 +68,10 @@ class App {
     }
     const time = dayjs().format('HH:mm');
     if (time < '12:00') {
-      await kabuka.fetchFund(fundBase, funds)
-      .then(async rows => {
-        for (const blocks of rows) {
-          await this.post({ blocks }, 'Fund');
-          await new Promise(resolve => { setTimeout(resolve, 8000); });
-        }
-      });
+      await this.fetchFund();
       return;
     }
-    await kabuka.fetchKabu(list)
-    .catch(e => logger.error({ e }) || [[]])
-    .then(async rows => {
-      for (const blocks of rows) {
-        await this.post({ blocks }, 'Kabuka');
-        await new Promise(resolve => { setTimeout(resolve, 8000); });
-      }
-    });
+    await this.fetchKabu();
   }
 
   async start() {

@@ -12,21 +12,22 @@ export class Kabuka {
     const name = main.querySelector('header')?.textContent || code;
     const area = main.querySelector('div:nth-child(3)');
     const price = area.querySelector('span')?.textContent;
-    const value = area.querySelector('div dd')?.textContent;
+    const changeText = area.querySelector('div dd')?.textContent || '';
+    const [change, changeRate] = changeText.split(/[()]/);
     const bbs = document.querySelector('#all_rate > div');
     const rate = (() => {
       if (!bbs) return 'no care';
       if (!bbs.querySelector('span')) return 'no idea';
       return bbs.querySelector('span > span')?.textContent || 'keep';
     })();
-    return { value, price, name, rate };
+    return { change, changeRate, price, name, rate };
   }
 
-  async fetchKabu(item, opt = { retry: 3 }) {
+  async fetchKabu({ item, opts }, opt = { retry: 3 }) {
     if (Array.isArray(item)) {
       const blocks = [];
       for (const single of item) {
-        blocks.push(await this.fetchKabu(single));
+        blocks.push(await this.fetchKabu({ item: single, opts }));
       }
       return blocks;
     }
@@ -43,11 +44,12 @@ export class Kabuka {
     .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document, code))
     .then(res => {
-      const { value, price, name, rate } = res;
+      const { change, changeRate, price, name, rate } = res;
+      opts.text.push(changeRate);
       return {
         type: 'section',
         fields: [
-          { type: 'mrkdwn', text: ['```', `${value.padStart(16)} ${price.padStart(8)} ${rate.padStart(10)}`, '```'].join('\n') },
+          { type: 'mrkdwn', text: ['```', `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`, '```'].join('\n') },
           { type: 'mrkdwn', text: `<${chart}|${name} ${code}>` },
         ],
       };
@@ -92,16 +94,16 @@ export class Kabuka {
     });
   }
 
-  async fetchFund(fundBase, funds) {
-    if (Array.isArray(funds)) {
+  async fetchFund(fundBase, { item, opts }) {
+    if (Array.isArray(item)) {
       const blocks = [];
-      for (const fund of funds) {
-        blocks.push(await this.fetchFund(fundBase, fund));
+      for (const single of item) {
+        blocks.push(await this.fetchFund(fundBase, { item: single, opts }));
       }
       return blocks;
     }
-    const url = `https://fund.smbc.co.jp/smbchp/main/index.aspx?F=fnd_details&KEY1=${funds.url}`;
-    return fetch(`${fundBase}${funds.url}`, {
+    const url = `https://fund.smbc.co.jp/smbchp/main/index.aspx?F=fnd_details&KEY1=${item.url}`;
+    return fetch(`${fundBase}${item.url}`, {
       headers: {
         'accept-language': 'ja',
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -116,13 +118,14 @@ export class Kabuka {
         InvestmentArea, InvestmentTarget,
         ReturnMonth1, ReturnMonth3, ReturnMonth6, ReturnYear1,
       }] = json.section1.data;
+      opts.text.push(ChangeRate);
       const fullName = FullName.replace('＜', '\n＜').replace('（', '\n（')
       .split('\n').map(name => `<${url}|${name}>`);
       const nbsp = '　';
       return {
         type: 'section',
         fields: [
-          { type: 'mrkdwn', text: ['```', `${NetAssetValue.padStart(8)} ${`${ChangeValue} (${ChangeRate} %)`.padStart(16)}`, '```', `<${url}|${nbsp}Month ${ReturnMonth1.padStart(9, nbsp)}>`, `<${url}|Month 3 ${ReturnMonth3.padStart(9, nbsp)}>`, `<${url}|Month 6 ${ReturnMonth6.padStart(9, nbsp)}>`, `<${url}|${nbsp}${nbsp}Year ${ReturnYear1.padStart(9, nbsp)}>`].join('\n') },
+          { type: 'mrkdwn', text: ['```', `${`${ChangeValue} (${ChangeRate} %)`.padStart(16)} ${NetAssetValue.padStart(9)}`, '```', `<${url}|${nbsp}Month ${ReturnMonth1.padStart(9, nbsp)}>`, `<${url}|Month 3 ${ReturnMonth3.padStart(9, nbsp)}>`, `<${url}|Month 6 ${ReturnMonth6.padStart(9, nbsp)}>`, `<${url}|${nbsp}${nbsp}Year ${ReturnYear1.padStart(9, nbsp)}>`].join('\n') },
           { type: 'mrkdwn', text: [fullName.join('\n'), '', `${InvestmentArea} / ${InvestmentTarget}`].join('\n') },
         ],
       };
