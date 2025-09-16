@@ -40,7 +40,7 @@ class App {
       logger.info('holiday today');
       return;
     }
-    const time = dayjs().format('hh:mm');
+    const time = dayjs().format('HH:mm');
     if (time < '12:00') {
       await kabuka.fetchFund(fundBase, funds)
       .then(async rows => {
