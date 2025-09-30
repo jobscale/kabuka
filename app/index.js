@@ -1,10 +1,61 @@
 import { logger } from '@jobscale/logger';
 import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
+import yahooFinance from 'yahoo-finance2';
 
 const financeUrl = 'https://finance.yahoo.co.jp/quote/{{code}}';
 const chartUrl = '/chart?trm=6m';
 const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
+
+const formatTimestamp = ts => new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+}).format(ts || new Date());
+
+const formatDate = ts => {
+  const [date] = formatTimestamp(ts).split(' ');
+  return date;
+};
+
+const getHistoricalPrices = async symbol => {
+  const latest = await yahooFinance.historical(symbol, {
+    period1: formatDate(dayjs().subtract(1, 'week')),
+    period2: formatDate(dayjs()),
+    interval: '1d',
+  });
+  const [nowData] = latest.reverse();
+
+  const dateYear3 = dayjs().subtract(3, 'year');
+  const dateYear1 = dayjs().subtract(1, 'year');
+  const dateMonth6 = dayjs().subtract(6, 'month');
+  const dateMonth3 = dayjs().subtract(3, 'month');
+  const dateMonth1 = dayjs().subtract(1, 'month');
+
+  const [
+    year3, year1, month6, month3, month1,
+  ] = await Promise.all([
+    dateYear3, dateYear1, dateMonth6, dateMonth3, dateMonth1,
+  ].map(async period => {
+    const [history] = await yahooFinance.historical(symbol, {
+      period1: formatDate(period),
+      period2: formatDate(period.add(1, 'week')),
+      interval: '1mo',
+    });
+    if (!history) return {};
+    const diffAmount = (nowData.adjClose - history.adjClose).toFixed(2);
+    const diffRate = ((diffAmount / history.adjClose) * 100).toFixed(2);
+    return { diffAmount, diffRate };
+  }));
+
+  return {
+    year3, year1, month6, month3, month1,
+  };
+};
 
 export class Kabuka {
   scraping(document, code) {
@@ -32,6 +83,9 @@ export class Kabuka {
       return blocks;
     }
     const { code } = item;
+    const {
+      year3, year1, month6, month3, month1,
+    } = await getHistoricalPrices(code);
     const uri = financeUrl.replace(/{{code}}/, code);
     const chart = `${uri}${chartUrl}`;
     return fetch(uri, {
@@ -49,7 +103,19 @@ export class Kabuka {
       return {
         type: 'section',
         fields: [
-          { type: 'mrkdwn', text: ['```', `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`, '```'].join('\n') },
+          {
+            type: 'mrkdwn',
+            text: [
+              '```',
+              `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`,
+              `year3  ${year3.diffAmount.padStart(11)} ${year3.diffRate.padStart(9)} %`,
+              `year1  ${year1.diffAmount.padStart(11)} ${year1.diffRate.padStart(9)} %`,
+              `month6 ${month6.diffAmount.padStart(11)} ${month6.diffRate.padStart(9)} %`,
+              `month3 ${month3.diffAmount.padStart(11)} ${month3.diffRate.padStart(9)} %`,
+              `month1 ${month1.diffAmount.padStart(11)} ${month1.diffRate.padStart(9)} %`,
+              '```',
+            ].join('\n'),
+          },
           { type: 'mrkdwn', text: `<${chart}|${name} ${code}>` },
         ],
       };

@@ -20,7 +20,8 @@
   "dependencies": {
     "@jobscale/logger": "^0.7.0",
     "dayjs": "^1.11.13",
-    "jsdom": "^26.1.0"
+    "jsdom": "^26.1.0",
+    "yahoo-finance2": "^2.13.3"
   },
   "devDependencies": {
     "eslint": "^8.57.1",
