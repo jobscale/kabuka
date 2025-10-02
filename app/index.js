@@ -27,14 +27,14 @@ const getChartPrices = async symbol => {
     period1: formatDate(dayjs().subtract(1, 'week')),
     period2: formatDate(dayjs()),
     interval: '1d',
-  });
+  }).catch(e => logger.warn(symbol, e.message) || { quotes: [] });
   const [nowData, yesterday] = latest.quotes.filter(v => v.close).reverse();
 
-  const dateYear3 = dayjs().subtract(3, 'year');
-  const dateYear1 = dayjs().subtract(1, 'year');
-  const dateMonth6 = dayjs().subtract(6, 'month');
-  const dateMonth3 = dayjs().subtract(3, 'month');
-  const dateMonth1 = dayjs().subtract(1, 'month');
+  const dateYear3 = dayjs().subtract(3, 'year').startOf('month');
+  const dateYear1 = dayjs().subtract(1, 'year').startOf('month');
+  const dateMonth6 = dayjs().subtract(6, 'month').startOf('month');
+  const dateMonth3 = dayjs().subtract(3, 'month').startOf('month');
+  const dateMonth1 = dayjs().subtract(1, 'month').startOf('month');
 
   const [
     year3, year1, month6, month3, month1,
@@ -45,17 +45,24 @@ const getChartPrices = async symbol => {
       period1: formatDate(period),
       period2: formatDate(period.add(1, 'week')),
       interval: '1mo',
-    });
+    }).catch(e => logger.warn(e.message, symbol) || { quotes: [] });
     if (!history) return {};
     const difference = nowData.adjclose - history.adjclose;
-    const diffAmount = difference.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    const diffRate = ((difference / history.adjclose) * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    return { diffAmount, diffRate };
+    const result = {};
+    result.diffAmount = difference.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    result.diffRate = ((difference / history.adjclose) * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    if (result.diffAmount[0] !== '-') result.diffAmount = `+${result.diffAmount}`;
+    if (result.diffRate[0] !== '-') result.diffRate = `+${result.diffRate}`;
+    result.diffRate += '%';
+    return result;
   }));
 
   const difference = nowData.close - yesterday.close;
   nowData.diffAmount = difference.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   nowData.diffRate = ((difference / yesterday.close) * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  if (nowData.diffAmount[0] !== '-') nowData.diffAmount = `+${nowData.diffAmount}`;
+  if (nowData.diffRate[0] !== '-') nowData.diffRate = `+${nowData.diffRate}`;
+  nowData.diffRate += '%';
   nowData.close = nowData.close.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   return [{
     year3, year1, month6, month3, month1,
@@ -88,9 +95,6 @@ export class Kabuka {
       return blocks;
     }
     const { code } = item;
-    const [{
-      year3, year1, month6, month3, month1,
-    }, nowData] = await getChartPrices(code);
     const uri = financeUrl.replace(/{{code}}/, code);
     const chart = `${uri}${chartUrl}`;
     return fetch(uri, {
@@ -102,17 +106,29 @@ export class Kabuka {
     .then(res => res.text())
     .then(data => new JSDOM(data).window.document)
     .then(document => this.scraping(document, code))
+    .then(async res => {
+      const [{
+        year3, year1, month6, month3, month1,
+      }, nowData] = await getChartPrices(code);
+      return [
+        res,
+        year3, year1, month6, month3, month1, nowData,
+      ];
+    })
     .then(res => {
-      const { change, changeRate, price, name, rate } = res;
+      const [
+        { change, changeRate, price, name, rate },
+        year3, year1, month6, month3, month1, nowData,
+      ] = res;
       opts.text.push(changeRate);
       const text = [
         `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`,
-        `year3  ${year3.diffAmount.padStart(7)} ${`(${year3.diffRate}%)`.padStart(10)}`,
-        `year1  ${year1.diffAmount.padStart(7)} ${`(${year1.diffRate}%)`.padStart(10)}`,
-        `month6 ${month6.diffAmount.padStart(7)} ${`(${month6.diffRate}%)`.padStart(10)}`,
-        `month3 ${month3.diffAmount.padStart(7)} ${`(${month3.diffRate}%)`.padStart(10)}`,
-        `month1 ${month1.diffAmount.padStart(7)} ${`(${month1.diffRate}%)`.padStart(10)}`,
-        `week1  ${nowData.diffAmount.padStart(7)} ${`(${nowData.diffRate}%)`.padStart(10)} ${nowData.close.padStart(9)}`,
+        `year3  ${year3.diffAmount?.padStart(7)} ${`(${year3.diffRate})`.padStart(10)}`,
+        `year1  ${year1.diffAmount?.padStart(7)} ${`(${year1.diffRate})`.padStart(10)}`,
+        `month6 ${month6.diffAmount?.padStart(7)} ${`(${month6.diffRate})`.padStart(10)}`,
+        `month3 ${month3.diffAmount?.padStart(7)} ${`(${month3.diffRate})`.padStart(10)}`,
+        `month1 ${month1.diffAmount?.padStart(7)} ${`(${month1.diffRate})`.padStart(10)}`,
+        `week1  ${nowData.diffAmount?.padStart(7)} ${`(${nowData.diffRate})`.padStart(10)} ${nowData.close.padStart(9)}`,
       ];
       return {
         type: 'section',
@@ -129,7 +145,7 @@ export class Kabuka {
       logger.warn({ code }, e);
       await new Promise(resolve => { setTimeout(resolve, 1000); });
       opt.retry--;
-      if (opt.retry >= 0) return this.fetch(item, opt);
+      if (opt.retry >= 0) return this.fetchKabu(item, opt);
       return {
         type: 'section',
         fields: [

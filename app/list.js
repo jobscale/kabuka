@@ -34,7 +34,6 @@ export const list = [
     { code: '3205.T', yield: 10.07 }, // ダイドーリミテッド
     { code: '287A.T', yield: 6.93 }, // 黒田グループ
     { code: '9782.T', yield: 7.20 }, // ディーエムエス
-    { code: '7488.N', yield: 6.48 }, // ヤガミ
     { code: '2497.T', yield: 4.01 }, // ユナイテッド
   ],
 

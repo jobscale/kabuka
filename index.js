@@ -24,7 +24,7 @@ class App {
   }
 
   async post({ blocks, text }, username) {
-    if (!text && !blocks.length) return;
+    if (!text && !blocks?.length) return;
     logger.info(JSON.stringify(text || blocks, null, 2));
     await this.postSlack({
       channel: '#kabu',
