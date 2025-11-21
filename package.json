@@ -1,32 +1,33 @@
 {
   "name": "kabuka",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Kabuka",
   "keywords": [
     "kabuka"
   ],
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "TZ=Etc/GMT node .",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run lint"
   },
   "pre-commit": [
-    "lint"
+    "test"
   ],
   "license": "MIT",
   "dependencies": {
-    "@jobscale/logger": "^0.7.0",
-    "dayjs": "^1.11.13",
-    "jsdom": "^26.1.0",
-    "yahoo-finance2": "^2.13.3"
+    "@jobscale/logger": "^0.8.4",
+    "dayjs": "^1.11.19",
+    "jsdom": "^27.2.0",
+    "yahoo-finance2": "^3.10.2"
   },
   "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^29.0.1"
+    "eslint-plugin-jest": "^29.2.0",
+    "precommit": "^1.2.2"
   }
 }

@@ -1,11 +1,13 @@
 import { logger } from '@jobscale/logger';
 import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
 
 const financeUrl = 'https://finance.yahoo.co.jp/quote/{{code}}';
 const chartUrl = '/chart?trm=6m';
 const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/fnd_rank&DISPTYPE=sales_1m';
+
+const yahooFinance = new YahooFinance();
 
 const formatTimestamp = ts => new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Tokyo',

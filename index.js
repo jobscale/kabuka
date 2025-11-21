@@ -1,11 +1,7 @@
 import { logger } from '@jobscale/logger';
 import dayjs from 'dayjs';
 import { kabuka } from './app/index.js';
-import {
-  list,
-  fundBase,
-  funds,
-} from './app/list.js';
+import { list, fundBase, funds } from './app/list.js';
 import { isHoliday, getHoliday } from './app/holiday.js';
 
 Object.assign(process.env, {
@@ -67,7 +63,7 @@ class App {
       return;
     }
     const time = dayjs().format('HH:mm');
-    if (time < '12:00') {
+    if (time < '10:00') {
       await this.fetchFund();
       return;
     }
