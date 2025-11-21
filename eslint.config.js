@@ -4,7 +4,7 @@ import jestPlugin from 'eslint-plugin-jest';
 export default [
   {
     name: 'standard base rule',
-    ignores: ['**/coverage/**'],
+    ignores: ['**/coverage/**', '**/assets/**', '**/*.min.js'],
     plugins: {
       import: importPlugin,
     },
@@ -42,6 +42,7 @@ export default [
       'space-in-parens': ['error', 'never'],
       'space-infix-ops': ['error'],
       'spaced-comment': ['error', 'always'],
+      'no-shadow': 'error',
       'no-console': ['warn'],
       'no-restricted-syntax': ['error', {
         selector: "CallExpression[callee.name='Number']",
