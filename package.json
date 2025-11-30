@@ -1,7 +1,7 @@
 {
   "name": "kabuka",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kabuka",
   "keywords": [
     "kabuka"
@@ -10,7 +10,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "TZ=Etc/GMT node .",
+    "start": "TZ=Etc/GMT node index.js",
     "lint": "eslint",
     "test": "npm run lint"
   },
@@ -25,7 +25,7 @@
     "yahoo-finance2": "^3.10.2"
   },
   "devDependencies": {
-    "@jobscale/eslint-plugin-standard": "^0.0.3",
+    "@jobscale/eslint-plugin-standard": "^0.0.8",
     "eslint": "^9.39.1",
     "eslint-plugin-jest": "^29.2.1",
     "pre-commit": "^1.2.2"

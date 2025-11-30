@@ -52,7 +52,7 @@ const getChartPrices = async symbol => {
     const difference = nowData.adjclose - history.adjclose;
     const result = {};
     result.diffAmount = difference.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    result.diffRate = ((difference / history.adjclose) * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    result.diffRate = (difference / history.adjclose * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     if (result.diffAmount[0] !== '-') result.diffAmount = `+${result.diffAmount}`;
     if (result.diffRate[0] !== '-') result.diffRate = `+${result.diffRate}`;
     result.diffRate += '%';
@@ -61,7 +61,7 @@ const getChartPrices = async symbol => {
 
   const difference = nowData.close - yesterday.close;
   nowData.diffAmount = difference.toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  nowData.diffRate = ((difference / yesterday.close) * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  nowData.diffRate = (difference / yesterday.close * 100).toLocaleString('ja-JP', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   if (nowData.diffAmount[0] !== '-') nowData.diffAmount = `+${nowData.diffAmount}`;
   if (nowData.diffRate[0] !== '-') nowData.diffRate = `+${nowData.diffRate}`;
   nowData.diffRate += '%';
@@ -174,7 +174,7 @@ export class Kabuka {
         const { Rank, FullName, NetAssetValue, ChangeValue } = data;
         const netAsset = Number.parseInt(NetAssetValue.replace(/,/, ''), 10);
         const change = Number.parseInt(ChangeValue, 10);
-        const percent = Math.round((change * 10000) / netAsset) / 100;
+        const percent = Math.round(change * 10000 / netAsset) / 100;
         return `${Rank.padStart(2)} ${NetAssetValue.padStart(8)} ${ChangeValue.padStart(6)}   ( ${percent} % ) ${FullName}`;
       })
       .join('\n');
