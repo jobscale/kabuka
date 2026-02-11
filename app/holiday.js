@@ -4,11 +4,10 @@ Object.assign(process.env, {
   TZ: 'Asia/Tokyo',
 });
 
-export const getHoliday = async () => {
+export const getHoliday = async (now = dayjs()) => {
   const holidays = await fetch('https://holidays-jp.github.io/api/v1/datetime.json')
   .then(res => res.json());
 
-  const now = dayjs();
   const dayAfter = [];
   for (let i = 0; i <= 10; i++) {
     const after = now.add(i, 'day').startOf('day');
