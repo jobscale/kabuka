@@ -12,7 +12,8 @@
   "scripts": {
     "start": "TZ=Etc/GMT node index.js",
     "lint": "eslint",
-    "test": "npm run lint"
+    "posttest": "npm run lint",
+    "test": "date -Iseconds"
   },
   "pre-commit": [
     "test"

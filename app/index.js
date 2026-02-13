@@ -134,13 +134,11 @@ export class Kabuka {
       ];
       return {
         type: 'section',
-        fields: [
-          {
-            type: 'mrkdwn',
-            text: ['```', ...text, '```'].join('\n'),
-          },
-          { type: 'mrkdwn', text: `<${chart}|${name} ${code}>` },
-        ],
+        fields: [{
+          type: 'mrkdwn', text: ['```', ...text, '```'].join('\n'),
+        }, {
+          type: 'mrkdwn', text: `<${chart}|${name} ${code}>`,
+        }],
       };
     })
     .catch(async e => {
@@ -200,8 +198,8 @@ export class Kabuka {
     })
     .then(res => res.text())
     .then(body => body.replace(/^fnd_details\(/, '').replace(/\)$/, ''))
-    .then(text => {
-      const json = JSON.parse(text);
+    .then(body => {
+      const json = JSON.parse(body);
       const [{
         FullName, NetAssetValue, ChangeValue, ChangeRate,
         InvestmentArea, InvestmentTarget,
@@ -210,13 +208,20 @@ export class Kabuka {
       opts.text.push(ChangeRate);
       const fullName = FullName.replace('＜', '\n＜').replace('（', '\n（')
       .split('\n').map(name => `<${url}|${name}>`);
-      const nbsp = '　';
+      const text = [
+        `${`${ChangeValue} (${ChangeRate}%)`.padStart(19)} ${NetAssetValue.padStart(9)}`,
+        `Year    ${ReturnYear1.padStart(9)}%`,
+        `Month 6 ${ReturnMonth6.padStart(9)}%`,
+        `Month 3 ${ReturnMonth3.padStart(9)}%`,
+        `Month   ${ReturnMonth1.padStart(9)}%`,
+      ];
       return {
         type: 'section',
-        fields: [
-          { type: 'mrkdwn', text: ['```', `${`${ChangeValue} (${ChangeRate} %)`.padStart(16)} ${NetAssetValue.padStart(9)}`, '```', `<${url}|${nbsp}Month ${ReturnMonth1.padStart(9, nbsp)}>`, `<${url}|Month 3 ${ReturnMonth3.padStart(9, nbsp)}>`, `<${url}|Month 6 ${ReturnMonth6.padStart(9, nbsp)}>`, `<${url}|${nbsp}${nbsp}Year ${ReturnYear1.padStart(9, nbsp)}>`].join('\n') },
-          { type: 'mrkdwn', text: [fullName.join('\n'), '', `${InvestmentArea} / ${InvestmentTarget}`].join('\n') },
-        ],
+        fields: [{
+          type: 'mrkdwn', text: ['```', ...text, '```'].join('\n'),
+        }, {
+          type: 'mrkdwn', text: [fullName.join('\n'), '', `${InvestmentArea} / ${InvestmentTarget}`].join('\n'),
+        }],
       };
     });
   }
