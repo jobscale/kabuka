@@ -1,4 +1,11 @@
 export const list = [
+  // インデックス
+  [
+    { code: '998407.O', yield: 0.00 }, // 日経平均株価
+    { code: '%5EDJI', yield: 0.00 }, // NYダウ
+    { code: '%5EGSPC', yield: 0.00 }, // S＆P 500
+  ],
+
   // 中長期保有
   [
     { code: '8316.T', yield: 3.66 }, // 三井住友FG
