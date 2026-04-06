@@ -1,17 +1,18 @@
 export const list = [
-  // インデックス
+  // 注目
   [
-    { code: '998407.O', yield: 0.00 }, // 日経平均株価
-    { code: '%5EDJI', yield: 0.00 }, // NYダウ
-    { code: '%5EGSPC', yield: 0.00 }, // S＆P 500
+    { code: '7532.T', yield: 0.00 }, // ドンキホーテ
+    { code: '3778.T', yield: 0.00 }, // さくらインターネット
+    { code: '9984.T', yield: 0.30 }, // ソフトバンクグループ
+    { code: '9433.T', yield: 2.89 }, // KDDI
+    { code: '9432.T', yield: 3.37 }, // NTT
   ],
 
   // 中長期保有
   [
-    { code: '8316.T', yield: 3.66 }, // 三井住友FG
-    { code: '6143.T', yield: 2.10 }, // ソディック
-    { code: '9432.T', yield: 3.40 }, // NTT
-    { code: '4967.T', yield: 2.20 }, // 小林製薬
+    { code: '8316.T', yield: 2.92 }, // 三井住友FG
+    { code: '6143.T', yield: 2.00 }, // ソディック
+    { code: '4967.T', yield: 1.40 }, // 小林製薬
     { code: '2215.T', yield: 0.00 }, // 第一屋製パン
   ],
   [
@@ -38,10 +39,10 @@ export const list = [
 
   // 高配当銘柄
   [
-    { code: '3205.T', yield: 10.07 }, // ダイドーリミテッド
-    { code: '287A.T', yield: 6.93 }, // 黒田グループ
-    { code: '9782.T', yield: 7.20 }, // ディーエムエス
-    { code: '2497.T', yield: 4.01 }, // ユナイテッド
+    { code: '3205.T', yield: 7.23 }, // ダイドーリミテッド
+    { code: '287A.T', yield: 6.30 }, // 黒田グループ
+    { code: '9782.T', yield: 7.00 }, // ディーエムエス
+    { code: '2497.T', yield: 4.55 }, // ユナイテッド
   ],
 
   // 短期保有銘柄
