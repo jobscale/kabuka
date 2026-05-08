@@ -125,12 +125,12 @@ export class Kabuka {
       opts.text.push(changeRate);
       const text = [
         `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`,
-        `year3  ${year3.diffAmount?.padStart(7)} ${`(${year3.diffRate})`.padStart(10)}`,
-        `year1  ${year1.diffAmount?.padStart(7)} ${`(${year1.diffRate})`.padStart(10)}`,
-        `month6 ${month6.diffAmount?.padStart(7)} ${`(${month6.diffRate})`.padStart(10)}`,
-        `month3 ${month3.diffAmount?.padStart(7)} ${`(${month3.diffRate})`.padStart(10)}`,
-        `month1 ${month1.diffAmount?.padStart(7)} ${`(${month1.diffRate})`.padStart(10)}`,
-        `week1  ${nowData.diffAmount?.padStart(7)} ${`(${nowData.diffRate})`.padStart(10)} ${nowData.close.padStart(9)}`,
+        ` year 3 ${year3.diffAmount?.padStart(7)} ${`(${year3.diffRate})`.padStart(10)}`,
+        `   year ${year1.diffAmount?.padStart(7)} ${`(${year1.diffRate})`.padStart(10)}`,
+        `month 6 ${month6.diffAmount?.padStart(7)} ${`(${month6.diffRate})`.padStart(10)}`,
+        `month 3 ${month3.diffAmount?.padStart(7)} ${`(${month3.diffRate})`.padStart(10)}`,
+        `  month ${month1.diffAmount?.padStart(7)} ${`(${month1.diffRate})`.padStart(10)}`,
+        `   week ${nowData.diffAmount?.padStart(7)} ${`(${nowData.diffRate})`.padStart(10)} ${nowData.close.padStart(9)}`,
       ];
       return {
         type: 'section',
@@ -202,7 +202,7 @@ export class Kabuka {
       const json = JSON.parse(body);
       const [{
         FullName, NetAssetValue, ChangeValue, ChangeRate,
-        InvestmentArea, InvestmentTarget,
+        InvestmentArea, InvestmentTarget, Settlement,
         ReturnMonth1, ReturnMonth3, ReturnMonth6, ReturnYear1,
       }] = json.section1.data;
       opts.text.push(ChangeRate);
@@ -210,11 +210,19 @@ export class Kabuka {
       .split('\n').map(name => `<${url}|${name}>`);
       const text = [
         `${`${ChangeValue} (${ChangeRate}%)`.padStart(19)} ${NetAssetValue.padStart(9)}`,
-        `Year    ${ReturnYear1.padStart(9)}%`,
-        `Month 6 ${ReturnMonth6.padStart(9)}%`,
-        `Month 3 ${ReturnMonth3.padStart(9)}%`,
-        `Month   ${ReturnMonth1.padStart(9)}%`,
-      ];
+        `      Year ${ReturnYear1.padStart(9)}%`,
+        `   Month 6 ${ReturnMonth6.padStart(9)}%`,
+        `   Month 3 ${ReturnMonth3.padStart(9)}%`,
+        `     Month ${ReturnMonth1.padStart(9)}%`,
+      ].filter(Boolean);
+
+      const current = Number.parseFloat(NetAssetValue.replace(/,/g, ''));
+      Settlement.reverse().forEach(({ Date, NAV }) => {
+        const past = Number.parseFloat(NAV.replace(/,/g, ''));
+        const diff = ((current / past - 1) * 100).toFixed(2);
+        text.push(`${Date}  ${NAV.padStart(8)}  ${diff.padStart(9)}%`);
+      });
+
       return {
         type: 'section',
         fields: [{
