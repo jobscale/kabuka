@@ -63,7 +63,7 @@ class App {
       return;
     }
     const time = dayjs().format('HH:mm');
-    if (time < '10:00') {
+    if (time < '12:00') {
       await this.fetchFund();
       return;
     }
