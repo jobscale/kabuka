@@ -30,7 +30,10 @@ const getChartPrices = async symbol => {
     period2: formatDate(dayjs()),
     interval: '1d',
   }).catch(e => logger.warn(symbol, e.message) || { quotes: [] });
-  const [nowData, yesterday] = latest.quotes.filter(v => v.close).reverse();
+  const [nowData, yesterday] = latest.quotes.reverse();
+
+  if (!nowData.close) nowData.close = nowData.open;
+  if (!nowData.adjclose) nowData.adjclose = nowData.open;
 
   const dateYear3 = dayjs().subtract(3, 'year').startOf('month');
   const dateYear1 = dayjs().subtract(1, 'year').startOf('month');
