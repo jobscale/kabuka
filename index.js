@@ -49,7 +49,7 @@ class App {
     for (const item of list) {
       opts.text = ['Kabuka'];
       await kabuka.fetchKabu({ item, opts })
-      .catch(e => logger.error({ e }) || [])
+      .catch(e => logger.error({ item, e }) || [])
       .then(async blocks => {
         await this.post({ blocks, text: opts.text.join(' ') }, 'Kabuka');
         await new Promise(resolve => { setTimeout(resolve, 5000); });
