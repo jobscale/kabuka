@@ -1,4 +1,4 @@
-import { logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import dayjs from 'dayjs';
 import { kabuka } from './app/index.js';
 import { list, fundBase, funds } from './app/list.js';

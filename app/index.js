@@ -1,4 +1,4 @@
-import { logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
 import YahooFinance from 'yahoo-finance2';

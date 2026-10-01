@@ -1,7 +1,7 @@
 {
-  "name": "kabuka",
   "private": true,
-  "version": "0.1.2",
+  "name": "kabuka",
+  "version": "0.1.3",
   "description": "Kabuka",
   "keywords": [
     "kabuka"
@@ -20,7 +20,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@jobscale/logger": "^0.10.1",
+    "@jobscale/create-logger": "^1.0.5",
     "dayjs": "^1.11.19",
     "jsdom": "^27.2.0",
     "yahoo-finance2": "^3.10.2"
