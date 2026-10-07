@@ -1,4 +1,5 @@
 import { logger } from '@jobscale/create-logger';
+import { formatTimestamp } from '@jobscale/timestamp';
 import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
 import YahooFinance from 'yahoo-finance2';
@@ -9,18 +10,8 @@ const fundRanking = 'https://fund.smbc.co.jp/smbchp/cgi/wrap/qjsonp.aspx?F=ctl/f
 
 const yahooFinance = new YahooFinance();
 
-const formatTimestamp = ts => new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-}).format(ts || new Date());
-
 const formatDate = ts => {
-  const [date] = formatTimestamp(ts).split(' ');
+  const [date] = formatTimestamp({ ts }).split(' ');
   return date;
 };
 
@@ -128,12 +119,12 @@ export class Kabuka {
       opts.text.push(changeRate);
       const text = [
         `${`${change} (${changeRate})`.padStart(16)} ${price.padStart(8)} ${rate.padStart(8)}`,
-        ` year 3 ${year3.diffAmount?.padStart(7)} ${`(${year3.diffRate})`.padStart(10)}`,
-        `   year ${year1.diffAmount?.padStart(7)} ${`(${year1.diffRate})`.padStart(10)}`,
-        `month 6 ${month6.diffAmount?.padStart(7)} ${`(${month6.diffRate})`.padStart(10)}`,
-        `month 3 ${month3.diffAmount?.padStart(7)} ${`(${month3.diffRate})`.padStart(10)}`,
-        `  month ${month1.diffAmount?.padStart(7)} ${`(${month1.diffRate})`.padStart(10)}`,
-        `   week ${nowData.diffAmount?.padStart(7)} ${`(${nowData.diffRate})`.padStart(10)} ${nowData.close.padStart(9)}`,
+        ` year 3 ${year3.diffAmount?.padStart(7) ?? ''} ${`(${year3.diffRate ?? ''})`.padStart(10)}`,
+        `   year ${year1.diffAmount?.padStart(7) ?? ''} ${`(${year1.diffRate ?? ''})`.padStart(10)}`,
+        `month 6 ${month6.diffAmount?.padStart(7) ?? ''} ${`(${month6.diffRate ?? ''})`.padStart(10)}`,
+        `month 3 ${month3.diffAmount?.padStart(7) ?? ''} ${`(${month3.diffRate ?? ''})`.padStart(10)}`,
+        `  month ${month1.diffAmount?.padStart(7) ?? ''} ${`(${month1.diffRate ?? ''})`.padStart(10)}`,
+        `   week ${nowData.diffAmount?.padStart(7) ?? ''} ${`(${nowData.diffRate ?? ''})`.padStart(10)} ${nowData.close.padStart(9)}`,
       ];
       return {
         type: 'section',
@@ -239,8 +230,4 @@ export class Kabuka {
 }
 
 export const kabuka = new Kabuka();
-
-export default {
-  Kabuka,
-  kabuka,
-};
+export default { Kabuka, kabuka };

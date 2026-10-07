@@ -183,8 +183,4 @@ export const funds = [[{
   url: '7931809A',
 }]];
 
-export default {
-  list,
-  fundBase,
-  funds,
-};
+export default { list, fundBase, funds };
