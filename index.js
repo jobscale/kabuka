@@ -77,7 +77,6 @@ class App {
   }
 }
 
-new App().start()
-.catch(e => {
-  logger.error(e.message, e);
-});
+export const app = new App();
+export const pending = app.start()
+.catch(e => logger.error(e));
